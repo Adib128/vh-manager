@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { CreateVehicleDto } from './dto/create-vehicle.dto';
@@ -19,14 +19,32 @@ export class VehiclesService {
   }
 
   async findOne(id: string): Promise<Vehicle> {
-    return await this.vehicleModel.findById(id).exec();
+    let vehicle;
+    try{
+      vehicle =  await this.vehicleModel.findById(id).exec();
+    }catch(error){
+      throw new NotFoundException(`Vehicle with the ID ${id} is not found`);
+    }
+    return vehicle ; 
   }
 
   async update(id: string, updateVehicleDto: UpdateVehicleDto): Promise<Vehicle> {
-    return await this.vehicleModel.findByIdAndUpdate(id, updateVehicleDto, {new: true}).exec();
+    let vehicle;
+    try{
+      vehicle =  await this.vehicleModel.findById(id).exec();
+      return await this.vehicleModel.findByIdAndUpdate(id, updateVehicleDto, {new: true}).exec();
+    }catch(error){
+      throw new NotFoundException(`Vehicle with the ID ${id} is not found`);
+    }
   }
 
   async remove(id: string): Promise<any> {
-    return await this.vehicleModel.findByIdAndRemove(id).exec();
+    let vehicle;
+    try{
+      vehicle =  await this.vehicleModel.findById(id).exec();
+      return await this.vehicleModel.findByIdAndRemove(id).exec();
+    }catch(error){
+      throw new NotFoundException(`Vehicle with the ID ${id} is not found`);
+    }
   }
 }
