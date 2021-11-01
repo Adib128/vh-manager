@@ -28,7 +28,7 @@ export class CustomersController {
   update(@Param('id') id: string, @Body() updateCustomerDto: UpdateCustomerDto) {
     return this.customersService.update(id, updateCustomerDto);
   }
- 
+
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.customersService.remove(id);
