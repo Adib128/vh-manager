@@ -11,7 +11,7 @@ export type BookingDocument = Booking & Document;
 export class Booking {
 
     @Prop()
-    fillDate: Date;
+    fillDate: string;
 
     @Prop()
     amount: number;
