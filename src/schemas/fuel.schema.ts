@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import * as mongoose from 'mongoose';
-import { Driver } from 'src/drivers/entities/driver.entity';
-import { Vehicle } from 'src/vehicles/entities/vehicle.entity';
+import { Vehicle } from './vehicle.schema';
+import { Driver } from './driver.schema';
 
 export type FuelDocument = Fuel & Document;
 

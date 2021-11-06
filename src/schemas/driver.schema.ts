@@ -21,7 +21,7 @@ export class Driver {
   licenseNo: number;
 
   @Prop()
-  expDate: Date;
+  expDate: string;
 }
 
 export const DriverSchema = SchemaFactory.createForClass(Driver);

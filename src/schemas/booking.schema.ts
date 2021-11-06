@@ -7,24 +7,37 @@ import { Customer } from './customer.schema';
 
 export type BookingDocument = Booking & Document;
 
+export class Location extends Document{
+  @Prop()
+  type: "Point";
+
+  @Prop()
+  cordinates: [number];
+}
+
 @Schema()
 export class Booking {
 
-    @Prop()
-    fillDate: string;
+  @Prop()
+  fromPoint: Location;
 
-    @Prop()
-    amount: number;
+  @Prop()
+  toPoint: Location;
 
-    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Customer' })
-    customer: Customer;
+  @Prop()
+  bookingDate: string;
 
-    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Vehicle' })
-    vehicle: Vehicle;
-  
-    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Driver' })
-    driver: Driver;
-    
+  @Prop()
+  amount: number;
+
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Customer' })
+  customer: Customer;
+
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Vehicle' })
+  vehicle: Vehicle;
+
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Driver' })
+  driver: Driver;
 }
 
 export const BookingSchema = SchemaFactory.createForClass(Booking);

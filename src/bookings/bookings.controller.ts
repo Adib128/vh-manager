@@ -11,12 +11,28 @@ export class BookingsController {
 
   @Post()
   create(@Body() createBookingDto: CreateBookingDto) {
+    //this.bookingsService.calculateDistance();
     return this.bookingsService.create(createBookingDto);
   }
 
   @Get()
   findAll() {
     return this.bookingsService.findAll();
+  }
+
+  @Get('/vehicle/:id')
+  findByVehicle(@Param('id') id:string) {
+    return this.bookingsService.findByVehicle(id);
+  }
+
+  @Get('/driver/:id')
+  findByDriver(@Param('id') id:string) {
+    return this.bookingsService.findByDriver(id);
+  }
+
+  @Get('/customer/:id')
+  findByCustomer(@Param('id') id:string) {
+    return this.bookingsService.findByCustomer(id);
   }
 
   @Get(':id')

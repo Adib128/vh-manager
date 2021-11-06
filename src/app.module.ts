@@ -5,6 +5,7 @@ import { CustomersModule } from './customers/customers.module';
 import { DriversModule } from './drivers/drivers.module';
 import { FuelsModule } from './fuels/fuels.module';
 import { BookingsModule } from './bookings/bookings.module';
+import { ExpensesModule } from './expenses/expenses.module';
 
 @Module({
   imports: [
@@ -13,7 +14,8 @@ import { BookingsModule } from './bookings/bookings.module';
     CustomersModule,
     DriversModule,
     FuelsModule,
-    BookingsModule
+    BookingsModule,
+    ExpensesModule
   ],
   controllers: [],
   providers: [],

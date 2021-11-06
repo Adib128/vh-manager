@@ -29,6 +29,5 @@ export class CreateDriverDto {
   
     @ApiProperty()
     @IsNotEmpty()
-    @IsDate()
-    expDate: Date;
+    expDate: string;
 }
