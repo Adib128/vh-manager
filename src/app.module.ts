@@ -6,16 +6,20 @@ import { DriversModule } from './drivers/drivers.module';
 import { FuelsModule } from './fuels/fuels.module';
 import { BookingsModule } from './bookings/bookings.module';
 import { ExpensesModule } from './expenses/expenses.module';
+import { AuthModule } from './auth/auth.module';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
-    MongooseModule.forRoot('mongodb://localhost:27017/vehicle'),
+    ConfigModule.forRoot({isGlobal: true}),
+    MongooseModule.forRoot(process.env.MONGO_URI),
     VehiclesModule,
     CustomersModule,
     DriversModule,
     FuelsModule,
     BookingsModule,
-    ExpensesModule
+    ExpensesModule,
+    AuthModule
   ],
   controllers: [],
   providers: [],
