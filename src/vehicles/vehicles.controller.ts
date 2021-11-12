@@ -2,12 +2,13 @@ import { Controller, Get, Post, Body, Param, Delete, Put, NotFoundException, Use
 import { VehiclesService } from './vehicles.service';
 import { CreateVehicleDto } from './dto/create-vehicle.dto';
 import { UpdateVehicleDto } from './dto/update-vehicle.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 
 @Controller('vehicles')
 @UseGuards(JwtAuthGuard)
 @ApiTags('Vehicle')
+@ApiBearerAuth('access-token')
 export class VehiclesController {
   constructor(private readonly vehiclesService: VehiclesService) {}
 

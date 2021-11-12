@@ -1,5 +1,5 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, Put, UseGuards } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { BookingsService } from './bookings.service';
 import { CreateBookingDto } from './dto/create-booking.dto';
@@ -8,12 +8,12 @@ import { UpdateBookingDto } from './dto/update-booking.dto';
 @Controller('bookings')
 @UseGuards(JwtAuthGuard)
 @ApiTags('Booking')
+@ApiBearerAuth('access-token')
 export class BookingsController {
   constructor(private readonly bookingsService: BookingsService) {}
 
   @Post()
   create(@Body() createBookingDto: CreateBookingDto) {
-    //this.bookingsService.calculateDistance();
     return this.bookingsService.create(createBookingDto);
   }
 

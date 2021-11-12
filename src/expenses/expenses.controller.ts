@@ -3,11 +3,12 @@ import { ExpensesService } from './expenses.service';
 import { CreateExpenseDto } from './dto/create-expense.dto';
 import { UpdateExpenseDto } from './dto/update-expense.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 @Controller('expenses')
 @UseGuards(JwtAuthGuard)
 @ApiTags('Expense')
+@ApiBearerAuth('access-token')
 export class ExpensesController {
   constructor(private readonly expensesService: ExpensesService) {}
 

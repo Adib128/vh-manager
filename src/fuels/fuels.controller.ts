@@ -2,12 +2,13 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, Put, UseGuards } fro
 import { FuelsService } from './fuels.service';
 import { CreateFuelDto } from './dto/create-fuel.dto';
 import { UpdateFuelDto } from './dto/update-fuel.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 
 @Controller('fuels')
 @UseGuards(JwtAuthGuard)
 @ApiTags('Fuel')
+@ApiBearerAuth('access-token')
 export class FuelsController {
   constructor(private readonly fuelsService: FuelsService) {}
 

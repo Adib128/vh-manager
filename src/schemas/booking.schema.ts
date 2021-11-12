@@ -30,6 +30,9 @@ export class Booking {
   @Prop()
   amount: number;
 
+  @Prop()
+  distance: number;
+
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Customer' })
   customer: Customer;
 
