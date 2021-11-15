@@ -25,7 +25,7 @@ export class Booking {
   toPoint: Location;
 
   @Prop()
-  bookingDate: string;
+  bookingDate: Date;
 
   @Prop()
   amount: number;

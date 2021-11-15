@@ -22,6 +22,7 @@ export class VehiclesService {
     let vehicle;
     try{
       vehicle =  await this.vehicleModel.findById(id).exec();
+      
     }catch(error){
       throw new NotFoundException(`Vehicle with the ID ${id} is not found`);
     }

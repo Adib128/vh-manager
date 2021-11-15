@@ -1,11 +1,14 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsIn, IsInt, IsNotEmpty } from "class-validator";
+import { Type } from 'class-transformer';
+import { IsDate, IsInt, IsNotEmpty } from "class-validator";
 import { Vehicle } from "src/schemas/vehicle.schema";
 
 export class CreateExpenseDto {
     @ApiProperty()
     @IsNotEmpty()
-    expenseDate: string;
+    @Type(() => Date)
+    @IsDate()
+    expenseDate: Date;
   
     @ApiProperty()
     @IsNotEmpty()

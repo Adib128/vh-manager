@@ -4,6 +4,7 @@ import { Customer } from "src/schemas/customer.schema";
 import { Driver } from "src/schemas/driver.schema";
 import { Vehicle } from "src/schemas/vehicle.schema";
 import { Location } from "src/schemas/booking.schema";
+import { Type } from 'class-transformer';
 export class CreateBookingDto {
 
     @ApiProperty()
@@ -16,7 +17,9 @@ export class CreateBookingDto {
     
     @ApiProperty()
     @IsNotEmpty()
-    bookingDate: string;
+    @Type(() => Date)
+    @IsDate()
+    bookingDate: Date;
 
     @ApiProperty()
     @IsNotEmpty()

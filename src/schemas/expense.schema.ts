@@ -8,7 +8,7 @@ export type ExpenseDocument = Expense & Document;
 export class Expense {
 
   @Prop()
-  expenseDate: string;
+  expenseDate: Date;
 
   @Prop()
   amount: number;

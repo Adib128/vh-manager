@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
 import { IsDate, IsIn, IsInt, IsNotEmpty } from 'class-validator';
 import { Driver } from 'src/schemas/driver.schema';
 import { Vehicle } from 'src/schemas/vehicle.schema';
@@ -22,6 +23,7 @@ export class CreateFuelDto {
   @ApiProperty()
   @IsNotEmpty()
   @IsDate()
+  @Type(() => Date)
   fillDate: Date;
 
   @ApiProperty()
