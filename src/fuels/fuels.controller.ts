@@ -1,9 +1,10 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Put, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Put, UseGuards, HttpCode } from '@nestjs/common';
 import { FuelsService } from './fuels.service';
 import { CreateFuelDto } from './dto/create-fuel.dto';
 import { UpdateFuelDto } from './dto/update-fuel.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { SearchFuelDto } from './dto/search-fuel.dto';
 
 @Controller('fuels')
 @UseGuards(JwtAuthGuard)
@@ -27,14 +28,15 @@ export class FuelsController {
     return this.fuelsService.findOne(id);
   }
 
-  @Get('/vehicle/:vehicleId')
-  findByVehicle(@Param('vehicleId') vehicleId: string) {
-    return this.fuelsService.findByVehicle(vehicleId);
+  @Post('/vehicle')
+  @HttpCode(200)
+  findByVehicle(@Body() searchFuelDto : SearchFuelDto) {
+    return this.fuelsService.findByVehicle(searchFuelDto);
   }
 
-  @Get('/driver/:driverId')
-  findByDriver(@Param('driverId') driverId: string) {
-    return this.fuelsService.findByDriver(driverId);
+  @Post('/driver')
+  findByDriver(@Body() searchFuelDto : SearchFuelDto) {
+    return this.fuelsService.findByDriver(searchFuelDto);
   }
 
   @Put(':id')

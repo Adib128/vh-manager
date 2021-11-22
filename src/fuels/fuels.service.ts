@@ -5,6 +5,7 @@ import { Driver, DriverDocument } from 'src/schemas/driver.schema';
 import { Fuel, FuelDocument } from 'src/schemas/fuel.schema';
 import { Vehicle, VehicleDocument } from 'src/schemas/vehicle.schema';
 import { CreateFuelDto } from './dto/create-fuel.dto';
+import { SearchFuelDto } from './dto/search-fuel.dto';
 import { UpdateFuelDto } from './dto/update-fuel.dto';
 
 @Injectable()
@@ -12,7 +13,7 @@ export class FuelsService {
   constructor(
     @InjectModel(Fuel.name) private fuelModel: Model<FuelDocument>,
     @InjectModel(Vehicle.name) private vehicleModel: Model<VehicleDocument>,
-    @InjectModel(Driver.name) private drivereModel: Model<DriverDocument>
+    @InjectModel(Driver.name) private driverModel: Model<DriverDocument>
   ){}
 
   async create(createFuelDto: CreateFuelDto): Promise<Fuel>  {
@@ -23,26 +24,48 @@ export class FuelsService {
     return await this.fuelModel.find().exec();
   }
 
-  async findByVehicle(vehicleId: string): Promise<Fuel[]> {
-    let fuel;
+  async findByVehicle(searchFuelDto: SearchFuelDto): Promise<Fuel[]> {
+    let fuels;
+    let vehicle;
     try{
-      let vehicle = await this.vehicleModel.findById(vehicleId).exec();
-      fuel =  await this.fuelModel.find({'vehicle' : vehicle}).exec();
+      vehicle  = await this.vehicleModel.findById(searchFuelDto.vehicle).exec();
+      fuels = await this.fuelModel.aggregate([
+        {
+          $match: {
+            vehicle:vehicle._id,
+            fillDate: {
+              $gte: searchFuelDto.startDate,
+              $lt: searchFuelDto.endDate
+            }
+          }
+        }
+      ]);
     }catch(error){
-      throw new NotFoundException(`Fuel record with the vehicle ID ${vehicleId} is not found`);
+      throw new NotFoundException(`Fuel records not found`);
     }
-    return fuel ; 
+    return fuels; 
   }
 
-  async findByDriver(driverId: string): Promise<Fuel[]> {
-    let fuel;
+  async findByDriver(searchFuelDto: SearchFuelDto): Promise<Fuel[]> {
+    let fuels;
+    let driver;
     try{
-      let driver = await this.drivereModel.findById(driverId).exec();
-      fuel =  await this.fuelModel.find({'driver' : driver}).exec();
+      driver  = await this.driverModel.findById(searchFuelDto.driver).exec();
+      fuels = await this.fuelModel.aggregate([
+        {
+          $match: {
+            driver:driver._id,
+            fillDate: {
+              $gte: searchFuelDto.startDate,
+              $lt: searchFuelDto.endDate
+            }
+          }
+        }
+      ]);
     }catch(error){
-      throw new NotFoundException(`Fuel record with the driver ID ${driverId} is not found`);
+      throw new NotFoundException(`Fuel records not found`);
     }
-    return fuel ; 
+    return fuels; 
   }
 
   async findOne(id: string): Promise<Fuel> {
