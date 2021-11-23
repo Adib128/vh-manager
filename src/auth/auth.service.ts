@@ -1,4 +1,9 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import {
+  Body,
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
@@ -10,19 +15,24 @@ import * as bcrypt from 'bcrypt';
 export class AuthService {
   constructor(
     @InjectModel(User.name) private userModel: Model<UserDocument>,
-    private jwtService: JwtService
+    private jwtService: JwtService,
   ) {}
 
-   async signUp(loginDto: LoginDto): Promise<User>{
-    const { username , password}  = loginDto ; 
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const user = {
-      username: username,
-      password: hashedPassword
-    }
+  async signUp(loginDto: LoginDto){
+    const { username, password } = loginDto;
+    let newUser;
+    let user ; 
     try {
-      await new this.userModel(user).save();
-      return user;
+      const hashedPassword = await bcrypt.hash(password, 10);
+      user = {
+        username: username,
+        password: hashedPassword,
+      };
+      newUser = await new this.userModel(user).save();
+      const payload = { username: loginDto.username, sub: newUser._id };
+      return {
+        accessToken: this.jwtService.sign(payload),
+      };
     } catch (error) {
       if (error.code === 11000) {
         throw new ConflictException('User already exists');
@@ -33,14 +43,13 @@ export class AuthService {
 
   async signIn(loginDto: LoginDto) {
     const user = await this.userModel.findOne({ username: loginDto.username });
-    const payload = { username: loginDto.username, sub: user._id};
+    const payload = { username: loginDto.username, sub: user._id };
     return {
       accessToken: this.jwtService.sign(payload),
     };
   }
 
   async validateUser(username: string, password: string): Promise<User> {
-
     const user = await this.userModel.findOne({ username });
 
     if (!user) {
@@ -56,4 +65,28 @@ export class AuthService {
     return null;
   }
 
+  async edit(id: string, @Body() body) {
+    let userObject;
+    try {
+      userObject = await this.userModel.findById(id).exec();
+      const valid = await bcrypt.compare(body.oldPassword, userObject.password);
+      if (!valid) {
+        return { success: false, error: 'Old password incorrect' };
+      }
+      body.newPassword = await bcrypt.hash(body.newPassword, 10);
+      await this.userModel
+        .findByIdAndUpdate(
+          id,
+          {
+            username: body.username,
+            password: body.newPassword,
+          },
+          { new: true },
+        )
+        .exec();
+      return { success: true };
+    } catch (error) {
+      throw new NotFoundException(`User with the ID ${id} is not found`);
+    }
+  }
 }
