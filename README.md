@@ -17,6 +17,8 @@ the system composed by:
 - [JWT](https://jwt.io/) standard for signature and optional encryption
 - [Bcrypt](https://www.npmjs.com/package/bcrypt) a password hashing library
 - [PassportJS](http://www.passportjs.org/) an authentication middleware for Node.js
+- [Swagger](https://swagger.io/) tools for documenting  RESTful APIs
+
 
 ## Installation
 
@@ -27,7 +29,7 @@ For Linux you need to install docker compose separately here [https://docs.docke
 
 ```bash
 # Get the latest snapshot
-$ git clone https://github.com/Adib128/api-srtj
+$ git clone https://github.com/Adib128/vh-manager.git
 
 # Change directory
 $ cd api-srtj
@@ -36,14 +38,14 @@ $ cd api-srtj
 $ docker-compose up
 
 ```
-Now if you go to http://127.0.0.1:3000/lines, you'll get
+Now if you go to https://vh-manager.herokuapp.com/api-docs/, you'll get
 
 ### Installation without docker
 
 You can install the project on your own server.
 ```bash
 # Get the latest snapshot
-$ git clone https://github.com/Adib128/api-srtj
+$ git clone https://github.com/Adib128/vh-manager.git
 
 # Change directory
 $ cd api-srtj
@@ -57,4 +59,4 @@ $ npm run start
 
 ## Documentation
 
-You'll find the documentation here [https://api-srtj.herokuapp.com/api-docs](https://api-srtj.herokuapp.com/api-docs).
+You'll find the documentation here [https://vh-manager.herokuapp.com/api-docs/](https://vh-manager.herokuapp.com/api-docs/).

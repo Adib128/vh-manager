@@ -8,7 +8,7 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe({transform: true}));
   const config = new DocumentBuilder()
     .setTitle('VH-Manager')
-    .setDescription('The API for managing vehicle')
+    .setDescription('VH-Manager is a RESTful API for Fleet Management System. This system enables the company to manage all the resources of the fleet and the vehicle booking.')
     .setVersion('1.0')
     .addTag('User')
     .addTag('Vehicle')

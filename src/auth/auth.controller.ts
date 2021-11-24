@@ -8,7 +8,6 @@ import { LocalAuthGuard } from './guards/local-auth.guard';
 
 @Controller('auth')
 @ApiTags('User')
-@ApiBearerAuth('access-token')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
@@ -24,7 +23,9 @@ export class AuthController {
     return this.authService.signIn(loginDto);
   }
 
+
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('access-token')
   @Post('profile/edit')
   @HttpCode(200)
   async edit(@Request() req) {
@@ -32,6 +33,7 @@ export class AuthController {
   }
 
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('access-token')
   @Get('profile')
   getProfile(@Request() req) {
     return req.user;
