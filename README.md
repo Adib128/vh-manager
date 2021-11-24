@@ -32,7 +32,7 @@ For Linux you need to install docker compose separately here [https://docs.docke
 $ git clone https://github.com/Adib128/vh-manager.git
 
 # Change directory
-$ cd api-srtj
+$ cd vh-manager
 
 # Runing the docker container
 $ docker-compose up
@@ -48,7 +48,7 @@ You can install the project on your own server.
 $ git clone https://github.com/Adib128/vh-manager.git
 
 # Change directory
-$ cd api-srtj
+$ cd vh-manager
 
 # Install NPM dependencies
 $ npm install
