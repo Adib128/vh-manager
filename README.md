@@ -38,7 +38,7 @@ $ cd vh-manager
 $ docker-compose up
 
 ```
-Now if you go to https://vh-manager.herokuapp.com/api-docs/, you'll get
+Now if you go to http://localhost:3000/api-docs/, you'll get
 
 ### Installation without docker
 
