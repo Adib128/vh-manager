@@ -59,4 +59,4 @@ $ npm run start
 
 ## Documentation
 
-You'll find the documentation here [https://vh-manager.herokuapp.com/api-docs/](https://vh-manager.herokuapp.com/api-docs/).
+You'll find the API documentation here [https://vh-manager.herokuapp.com/api-docs/](https://vh-manager.herokuapp.com/api-docs/).
