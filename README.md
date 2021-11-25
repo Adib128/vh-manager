@@ -1,5 +1,5 @@
 
-# VH-Manager - Fleet Management System RESTfUL API
+# VH-Manager - Fleet Management System RESTful API
 VH-Manager is a RESTful API for Fleet Management System. This system enables the company to manage all the resources of the fleet and the vehicle booking.
 the system composed by:
 
