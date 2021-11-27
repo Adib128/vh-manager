@@ -8,7 +8,6 @@ import { BookingsModule } from './bookings/bookings.module';
 import { ExpensesModule } from './expenses/expenses.module';
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
-
 @Module({
   imports: [
     ConfigModule.forRoot({isGlobal: true}),
