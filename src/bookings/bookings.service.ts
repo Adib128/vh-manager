@@ -21,20 +21,7 @@ export class BookingsService {
   ) {}
 
   async create(createBookingDto: CreateBookingDto): Promise<Booking> {
-    const {fromPoint, toPoint} = createBookingDto;
-    const distance = await this.calculateDistance(fromPoint, toPoint);
-    return await new this.bookingModel({...createBookingDto, distance}).save();
-  }
-
-  async calculateDistance(fromPoint, toPoint) {
-    const data = {
-      "from_points": [fromPoint.cordinates],
-      "to_points": [toPoint.cordinates],
-      "out_arrays": ["distances"],
-      "vehicle": "car"
-    }
-     const response = await this.httpService.post('https://graphhopper.com/api/1/matrix?key=67f9c3cc-264e-4ca8-9816-c017718aeec3', data).toPromise();
-     return response.data.distances[0][0];
+    return await new this.bookingModel(createBookingDto).save();
   }
 
   async findAll(): Promise<Booking[]> {

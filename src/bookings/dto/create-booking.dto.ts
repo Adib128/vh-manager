@@ -5,6 +5,7 @@ import { Driver } from "src/schemas/driver.schema";
 import { Vehicle } from "src/schemas/vehicle.schema";
 import { Location } from "src/schemas/booking.schema";
 import { Type } from 'class-transformer';
+
 export class CreateBookingDto {
 
     @ApiProperty()
@@ -14,6 +15,11 @@ export class CreateBookingDto {
     @ApiProperty()
     @IsNotEmpty()
     toPoint: Location;
+
+    @ApiProperty()
+    @IsNotEmpty()
+    @IsInt()
+    distance: number;
     
     @ApiProperty()
     @IsNotEmpty()

@@ -31,8 +31,8 @@ export class VehiclesService {
     try{
       vehicle =  await this.vehicleModel.findById(id).exec();
       let totalConsumption = await this.totalConsumption(vehicle);
-      let mileage = await this.totalMileage(vehicle);
-      VehicleDetails = {vehicle, consumption: totalConsumption, mileage: mileage } ;
+      let totalMileage = await this.totalMileage(vehicle);
+      VehicleDetails = {vehicle, consumption: totalConsumption, mileage: totalMileage } ;
     }catch(error){
       throw new NotFoundException(`Vehicle with the ID ${id} is not found`);
     }
@@ -60,7 +60,8 @@ export class VehiclesService {
   }
 
   async totalConsumption(vehicle): Promise<number>{
-    let consumption
+    let totalConsumption = 0 ; 
+    let consumption;
     try{
       consumption = await this.fuelModel.aggregate([
         {
@@ -76,14 +77,16 @@ export class VehiclesService {
           }
         }
       ]);
+      if(consumption.length != 0) totalConsumption =  consumption[0].sm;
     }catch(error){
       throw new NotFoundException(`Consumption of the Vehicle  with the ID ${vehicle._id} is not found`);
     }
-    return consumption[0].sm;
+    return totalConsumption;
   }
 
   async totalMileage(vehicle): Promise<number>{
-    let mileage
+    let totalMileage = 0 ; 
+    let mileage ; 
     try{
       mileage = await this.bookingModel.aggregate([
         {
@@ -99,10 +102,11 @@ export class VehiclesService {
           }
         }
       ]);
+      if(mileage.length != 0) totalMileage = mileage[0].sm ; 
     }catch(error){
       throw new NotFoundException(`Mileage of the Vehicle  with the ID ${vehicle._id} is not found`);
     }
-    return mileage[0].sm;
+    return totalMileage;
   }
 
 }

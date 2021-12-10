@@ -33,6 +33,7 @@ export class ExpensesService {
     }
     return expense;
   }
+  
   async findByVehicle(vehicleId: string): Promise<Expense> {
     let expenses;
     try {

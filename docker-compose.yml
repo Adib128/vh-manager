@@ -8,9 +8,20 @@ services:
       - '3000:3000'
     links:
       - mongo
+    networks:
+      - vhmanager  
   mongo:
     container_name: mongo
     image: mongo
     ports:
       - '27017:27017'
-          
+    volumes:
+      - mongodb:/data/db  
+    networks:
+      - vhmanager   
+volumes:
+  mongodb:
+    driver: local
+networks:
+  vhmanager:
+     driver: bridge

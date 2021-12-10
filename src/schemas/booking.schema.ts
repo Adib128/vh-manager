@@ -25,13 +25,13 @@ export class Booking {
   toPoint: Location;
 
   @Prop()
+  distance: number;
+
+  @Prop()
   bookingDate: Date;
 
   @Prop()
   amount: number;
-
-  @Prop()
-  distance: number;
 
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Customer' })
   customer: Customer;

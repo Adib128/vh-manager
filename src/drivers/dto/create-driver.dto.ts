@@ -1,11 +1,11 @@
 import { ApiProperty } from "@nestjs/swagger";
+import { Type } from "class-transformer";
 import { IsDate, IsEmail, IsInt, IsNotEmpty } from "class-validator";
 
 export class CreateDriverDto {
     
     @ApiProperty()
     @IsNotEmpty()
-    @IsInt()
     registrationNumber: string;
   
     @ApiProperty()
@@ -29,5 +29,7 @@ export class CreateDriverDto {
   
     @ApiProperty()
     @IsNotEmpty()
-    expDate: string;
+    @Type(() => Date)
+    @IsDate()
+    expDate: Date;
 }
