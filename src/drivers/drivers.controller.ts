@@ -6,9 +6,9 @@ import { CreateDriverDto } from './dto/create-driver.dto';
 import { UpdateDriverDto } from './dto/update-driver.dto';
 
 @Controller('drivers')
-@UseGuards(JwtAuthGuard)
+//@UseGuards(JwtAuthGuard)
 @ApiTags('Driver')
-@ApiBearerAuth('access-token')
+//@ApiBearerAuth('access-token')
 export class DriversController {
   constructor(private readonly driversService: DriversService) {}
 
@@ -24,16 +24,16 @@ export class DriversController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.driversService.findOne(id);
+    return this.driversService.findOne(+id);
   }
 
   @Put(':id')
   update(@Param('id') id: string, @Body() updateDriverDto: UpdateDriverDto) {
-    return this.driversService.update(id, updateDriverDto);
+    return this.driversService.update(+id, updateDriverDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.driversService.remove(id);
+    return this.driversService.remove(+id);
   }
 }

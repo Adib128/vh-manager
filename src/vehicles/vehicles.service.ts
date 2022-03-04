@@ -68,6 +68,7 @@ export class VehiclesService {
       throw new BadRequestException('Error on vehicle updating');
     }
   }
+  
   // Remove vehicle
   async remove(id: number): Promise<any> {
     try {

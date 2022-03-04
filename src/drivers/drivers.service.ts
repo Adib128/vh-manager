@@ -1,50 +1,84 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { Driver, DriverDocument } from 'src/schemas/driver.schema';
+import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
+import { PrismaService } from 'prisma.service';
 import { CreateDriverDto } from './dto/create-driver.dto';
 import { UpdateDriverDto } from './dto/update-driver.dto';
 
 @Injectable()
 export class DriversService {
-  constructor(@InjectModel(Driver.name) private driverModel: Model<DriverDocument>){}
-  
-  async create(createDriverDto: CreateDriverDto): Promise<Driver>  {
-    return await new this.driverModel(createDriverDto).save();
-  }
+  constructor(private prisma: PrismaService) {}
 
-  async findAll(): Promise<Driver[]> {
-    return await this.driverModel.find().exec();
-  }
-
-  async findOne(id: string): Promise<Driver> {
-    let driver;
-    try{
-      driver =  await this.driverModel.findById(id).exec();
-    }catch(error){
-      throw new NotFoundException(`Driver with the ID ${id} is not found`);
-    }
-    return driver ; 
-  }
-
-  async update(id: string, updateDriverDto: UpdateDriverDto): Promise<Driver> {
-    let driver;
-    try{
-      driver =  await this.driverModel.findById(id).exec();
-      return await this.driverModel.findByIdAndUpdate(id, updateDriverDto, {new: true}).exec();
-    }catch(error){
-      throw new NotFoundException(`Driver with the ID ${id} is not found`);
+  // Create new driver
+  async create(createDriverDto: CreateDriverDto) {
+    try {
+      return await this.prisma.driver.create({
+        data: createDriverDto,
+      });
+    } catch (e) {
+      // Check if error is coming from prisma client
+      if (e instanceof Prisma.PrismaClientKnownRequestError) {
+        // Check if driver exists by the error code P2002
+        if (e.code === 'P2002') {
+          throw new ConflictException('Driver is already exist');
+        }
+      }
+      throw new BadRequestException('Error on driver creating');
     }
   }
 
-  async remove(id: string): Promise<any> {
-    let driver;
-    try{
-      driver =  await this.driverModel.findById(id).exec();
-      return await this.driverModel.findByIdAndRemove(id).exec();
-    }catch(error){
+  // Return drivers list
+  async findAll() {
+    return await this.prisma.driver.findMany();
+  }
+
+  // Return driver by ID
+  async findOne(id: number) {
+    const driver = await this.prisma.driver.findUnique({
+      where: {
+        id,
+      },
+    });
+    // Check if the selected driver is null and throw not found exception
+    if (!driver) {
       throw new NotFoundException(`Driver with the ID ${id} is not found`);
+    }
+    return driver;
+  }
+
+  // Update driver information
+  async update(id: number, updateDriverDto: UpdateDriverDto) {
+    try {
+      return await this.prisma.driver.update({
+        where: { id },
+        data: updateDriverDto,
+      });
+    } catch (e) {
+      // Check if error is coming from prisma client
+      if (e instanceof Prisma.PrismaClientKnownRequestError) {
+        // Check if driver found by the error code P2025
+        if (e.code === 'P2025') {
+          throw new NotFoundException(`Driver with the ID ${id} is not found`);
+        }
+      }
+      throw new BadRequestException('Error on driver updating');
     }
   }
 
+  // Remove driver
+  async remove(id: number) {
+    try {
+      return await this.prisma.driver.delete({
+        where: { id },
+      });
+    } catch (e) {
+      // Check if error is coming from prisma client
+      if (e instanceof Prisma.PrismaClientKnownRequestError) {
+        // Check if driver found by the error code P2025
+        if (e.code === 'P2025') {
+          throw new NotFoundException(`Driver with the ID ${id} is not found`);
+        }
+      }
+      throw new BadRequestException('Error on driver deleting');
+    }
+  }
 }

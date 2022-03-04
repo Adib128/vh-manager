@@ -26,3 +26,13 @@ model Vehicle {
   transmission       String
   purchaseDate       DateTime
 }
+
+model Driver {
+  id                 Int      @id @default(autoincrement())
+  registrationNumber String
+  name               String
+  email              String
+  phoneNumber        Int
+  licenseNo          Int
+  expDate            DateTime
+}
