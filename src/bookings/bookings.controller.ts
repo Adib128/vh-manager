@@ -6,9 +6,9 @@ import { CreateBookingDto } from './dto/create-booking.dto';
 import { UpdateBookingDto } from './dto/update-booking.dto';
 
 @Controller('bookings')
-@UseGuards(JwtAuthGuard)
+//@UseGuards(JwtAuthGuard)
 @ApiTags('Booking')
-@ApiBearerAuth('access-token')
+//@ApiBearerAuth('access-token')
 export class BookingsController {
   constructor(private readonly bookingsService: BookingsService) {}
 

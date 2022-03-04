@@ -1,49 +1,81 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { Customer, CustomerDocument } from 'src/schemas/customer.schema';
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
+import { Prisma } from '@prisma/client';
+import { PrismaService } from 'prisma.service';
 import { CreateCustomerDto } from './dto/create-customer.dto';
 import { UpdateCustomerDto } from './dto/update-customer.dto';
 
 @Injectable()
 export class CustomersService {
-  constructor(@InjectModel(Customer.name) private customerModel: Model<CustomerDocument>){}
+  constructor(private prisma: PrismaService) {}
 
-  async create(createCustomerDto: CreateCustomerDto): Promise<Customer>  {
-    return await new this.customerModel(createCustomerDto).save();
-  }
-
-  async findAll(): Promise<Customer[]> {
-    return await this.customerModel.find().exec();
-  }
-
-  async findOne(id: string): Promise<Customer> {
-    let customer;
-    try{
-      customer =  await this.customerModel.findById(id).exec();
-    }catch(error){
-      throw new NotFoundException(`Customer with the ID ${id} is not found`);
-    }
-    return customer ; 
-  }
-
-  async update(id: string, updateCustomerDto: UpdateCustomerDto): Promise<Customer> {
-    let customer;
-    try{
-      customer =  await this.customerModel.findById(id).exec();
-      return await this.customerModel.findByIdAndUpdate(id, updateCustomerDto, {new: true}).exec();
-    }catch(error){
-      throw new NotFoundException(`Customer with the ID ${id} is not found`);
+  async create(createCustomerDto: CreateCustomerDto) {
+    try {
+      return await this.prisma.customer.create({
+        data: createCustomerDto,
+      });
+    } catch (e) {
+      if (e instanceof Prisma.PrismaClientKnownRequestError) {
+        if (e.code === 'P2002') {
+          throw new ConflictException('Customer is already exist');
+        }
+      }
+      throw new BadRequestException('Error on customer creating');
     }
   }
 
-  async remove(id: string): Promise<any> {
-    let customer;
-    try{
-      customer =  await this.customerModel.findById(id).exec();
-      return await this.customerModel.findByIdAndRemove(id).exec();
-    }catch(error){
+  async findAll() {
+    return await this.prisma.customer.findMany();
+  }
+
+  async findOne(id: number) {
+    const customer = await this.prisma.customer.findUnique({
+      where: {
+        id,
+      },
+    });
+    if (!customer) {
       throw new NotFoundException(`Customer with the ID ${id} is not found`);
+    }
+    return customer;
+  }
+
+  async update(id: number, updateCustomerDto: UpdateCustomerDto) {
+    try {
+      return await this.prisma.customer.update({
+        where: { id },
+        data: updateCustomerDto,
+      });
+    } catch (e) {
+      if (e instanceof Prisma.PrismaClientKnownRequestError) {
+        if (e.code === 'P2025') {
+          throw new NotFoundException(
+            `Customer with the ID ${id} is not found`,
+          );
+        }
+      }
+      throw new BadRequestException('Error on customer updating');
+    }
+  }
+
+  async remove(id: number) {
+    try {
+      return await this.prisma.customer.delete({
+        where: { id },
+      });
+    } catch (e) {
+      if (e instanceof Prisma.PrismaClientKnownRequestError) {
+        if (e.code === 'P2025') {
+          throw new NotFoundException(
+            `Customer with the ID ${id} is not found`,
+          );
+        }
+      }
+      throw new BadRequestException('Error on customer deleting');
     }
   }
 }
