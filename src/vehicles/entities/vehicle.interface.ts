@@ -1,4 +1,4 @@
-import { Vehicle } from "src/schemas/vehicle.schema";
+import { Vehicle } from "@prisma/client";
 
 export class VehicleDetails {
     vehicle: Vehicle;

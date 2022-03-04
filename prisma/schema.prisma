@@ -9,8 +9,20 @@ generator client {
 
 model Customer {
   id          Int    @id @default(autoincrement())
-  name        String 
+  name        String
   email       String @unique
-  phoneNumber Int @unique
+  phoneNumber Int    @unique
   address     String
+}
+
+model Vehicle {
+  id                 Int      @id @default(autoincrement())
+  registrationNumber String
+  make               String
+  model              String
+  type               String
+  consumptionType    String
+  fuelType           String
+  transmission       String
+  purchaseDate       DateTime
 }

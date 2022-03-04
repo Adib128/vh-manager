@@ -1,112 +1,88 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { Model } from 'mongoose';
-import { InjectModel } from '@nestjs/mongoose';
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateVehicleDto } from './dto/create-vehicle.dto';
 import { UpdateVehicleDto } from './dto/update-vehicle.dto';
-import { Vehicle, VehicleDocument } from '../schemas/vehicle.schema';
-import { Fuel, FuelDocument } from 'src/schemas/fuel.schema';
-import { VehicleDetails } from './entities/vehicle.interface';
-import { Booking, BookingDocument } from 'src/schemas/booking.schema';
+import { PrismaService } from 'prisma.service';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class VehiclesService {
+  constructor(private prisma: PrismaService) {}
 
-  constructor(
-    @InjectModel(Vehicle.name) private vehicleModel: Model<VehicleDocument>,
-    @InjectModel(Fuel.name) private fuelModel: Model<FuelDocument>,
-    @InjectModel(Booking.name) private bookingModel: Model<BookingDocument>
-  ){}
-
-  async create(createVehicleDto: CreateVehicleDto): Promise<Vehicle>  {
-    return await new this.vehicleModel(createVehicleDto).save();
-  }
-
-  async findAll(): Promise<Vehicle[]> {
-    return await this.vehicleModel.find().exec();
-  }
-
-  async findOne(id: string):Promise<VehicleDetails> {
-    let vehicle;
-    let VehicleDetails;
-    try{
-      vehicle =  await this.vehicleModel.findById(id).exec();
-      let totalConsumption = await this.totalConsumption(vehicle);
-      let totalMileage = await this.totalMileage(vehicle);
-      VehicleDetails = {vehicle, consumption: totalConsumption, mileage: totalMileage } ;
-    }catch(error){
-      throw new NotFoundException(`Vehicle with the ID ${id} is not found`);
-    }
-    return VehicleDetails ; 
-  }
-
-  async update(id: string, updateVehicleDto: UpdateVehicleDto): Promise<Vehicle> {
-    let vehicle;
-    try{
-      vehicle =  await this.vehicleModel.findById(id).exec();
-      return await this.vehicleModel.findByIdAndUpdate(id, updateVehicleDto, {new: true}).exec();
-    }catch(error){
-      throw new NotFoundException(`Vehicle with the ID ${id} is not found`);
-    }
-  }
-
-  async remove(id: string): Promise<any> {
-    let vehicle;
-    try{
-      vehicle =  await this.vehicleModel.findById(id).exec();
-      return await this.vehicleModel.findByIdAndRemove(id).exec();
-    }catch(error){
-      throw new NotFoundException(`Vehicle with the ID ${id} is not found`);
-    }
-  }
-
-  async totalConsumption(vehicle): Promise<number>{
-    let totalConsumption = 0 ; 
-    let consumption;
-    try{
-      consumption = await this.fuelModel.aggregate([
-        {
-          $match: {
-            vehicle: vehicle._id
-          }
-        }, {
-          $group: {
-            _id: '$vehicle', 
-            sm: {
-              $sum: '$quantity'
-            }
-          }
+  // Create new vehicle
+  async create(createVehicleDto: CreateVehicleDto) {
+    try {
+      return await this.prisma.vehicle.create({
+        data: createVehicleDto,
+      });
+    } catch (e) {
+      // Check if error is coming from prisma client
+      if (e instanceof Prisma.PrismaClientKnownRequestError) {
+        // Check if vehicle exists by the error code P2002
+        if (e.code === 'P2002') {
+          throw new ConflictException('Vehicle is already exist');
         }
-      ]);
-      if(consumption.length != 0) totalConsumption =  consumption[0].sm;
-    }catch(error){
-      throw new NotFoundException(`Consumption of the Vehicle  with the ID ${vehicle._id} is not found`);
+      }
+      throw new BadRequestException('Error on vehicle creating');
     }
-    return totalConsumption;
   }
 
-  async totalMileage(vehicle): Promise<number>{
-    let totalMileage = 0 ; 
-    let mileage ; 
-    try{
-      mileage = await this.bookingModel.aggregate([
-        {
-          $match: {
-            vehicle: vehicle._id
-          }
-        }, {
-          $group: {
-            _id: '$vehicle', 
-            sm: {
-              $sum: '$distance'
-            }
-          }
+  // Return vehicles list
+  async findAll() {
+    return await this.prisma.vehicle.findMany();
+  }
+
+  // Return vehicle by ID
+  async findOne(id: number) {
+    const vehicle = await this.prisma.vehicle.findUnique({
+      where: {
+        id,
+      },
+    });
+    // Check if the selected vehicle is null and throw not found exception
+    if (!vehicle) {
+      throw new NotFoundException(`Veicle with the ID ${id} is not found`);
+    }
+    return vehicle;
+  }
+
+  // Update vehilce information
+  async update(id: number, updateVehicleDto: UpdateVehicleDto) {
+    try {
+      return await this.prisma.vehicle.update({
+        where: { id },
+        data: updateVehicleDto,
+      });
+    } catch (e) {
+      // Check if error is coming from prisma client
+      if (e instanceof Prisma.PrismaClientKnownRequestError) {
+        // Check if vehicle found by the error code P2025
+        if (e.code === 'P2025') {
+          throw new NotFoundException(`Vehicle with the ID ${id} is not found`);
         }
-      ]);
-      if(mileage.length != 0) totalMileage = mileage[0].sm ; 
-    }catch(error){
-      throw new NotFoundException(`Mileage of the Vehicle  with the ID ${vehicle._id} is not found`);
+      }
+      throw new BadRequestException('Error on vehicle updating');
     }
-    return totalMileage;
   }
-
+  // Remove vehicle
+  async remove(id: number): Promise<any> {
+    try {
+      return await this.prisma.vehicle.delete({
+        where: { id },
+      });
+    } catch (e) {
+      // Check if error is coming from prisma client
+      if (e instanceof Prisma.PrismaClientKnownRequestError) {
+        // Check if vehicle found by the error code P2025
+        if (e.code === 'P2025') {
+          throw new NotFoundException(`Vehicle with the ID ${id} is not found`);
+        }
+      }
+      throw new BadRequestException('Error on vehicle deleting');
+    }
+  }
 }

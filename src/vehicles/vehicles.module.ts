@@ -6,6 +6,7 @@ import { Vehicle } from './entities/vehicle.entity';
 import { VehicleSchema } from 'src/schemas/vehicle.schema';
 import { Fuel, FuelSchema } from 'src/schemas/fuel.schema';
 import { Booking, BookingSchema } from 'src/schemas/booking.schema';
+import { PrismaService } from 'prisma.service';
 
 @Module({
   imports: [
@@ -14,6 +15,6 @@ import { Booking, BookingSchema } from 'src/schemas/booking.schema';
     MongooseModule.forFeature([{ name: Booking.name, schema: BookingSchema }]),
   ],
   controllers: [VehiclesController],
-  providers: [VehiclesService]
+  providers: [VehiclesService, PrismaService]
 })
 export class VehiclesModule {}
