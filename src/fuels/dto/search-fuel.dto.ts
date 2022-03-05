@@ -1,25 +1,21 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { Type } from "class-transformer";
-import { IsDate, IsEmpty, IsInt, IsNotEmpty } from "class-validator";
-import { EmptyError } from "rxjs";
+import { IsDate, IsEmpty, IsInt, IsNotEmpty, IsOptional } from "class-validator";
 
 export class SearchFuelDto {
+  @ApiProperty()
+  @IsOptional()
+  @IsInt()
+  vehicleId: number;
 
-    @ApiProperty()
-    @IsEmpty()
-    vehicle: string;
+  @ApiProperty()
+  @IsOptional()
+  @IsInt()
+  driverId: number;
 
-    @ApiProperty()
-    @IsEmpty()
-    driver: string;
-
-    @ApiProperty()
-    @Type(() => Date)
-    @IsDate()
-    startDate: Date;
-
-    @ApiProperty()
-    @Type(() => Date)
-    @IsDate()
-    endDate: Date;
+  @ApiProperty()
+  @Type(() => Date)
+  @IsDate()
+  @IsOptional()
+  fillDate: Date;
 }

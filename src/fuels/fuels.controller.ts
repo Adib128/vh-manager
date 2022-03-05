@@ -7,9 +7,9 @@ import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { SearchFuelDto } from './dto/search-fuel.dto';
 
 @Controller('fuels')
-@UseGuards(JwtAuthGuard)
+//@UseGuards(JwtAuthGuard)
 @ApiTags('Fuel')
-@ApiBearerAuth('access-token')
+//@ApiBearerAuth('access-token')
 export class FuelsController {
   constructor(private readonly fuelsService: FuelsService) {}
 
@@ -25,27 +25,22 @@ export class FuelsController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.fuelsService.findOne(id);
+    return this.fuelsService.findOne(+id);
   }
 
-  @Post('/vehicle')
+  @Post('/search')
   @HttpCode(200)
   findByVehicle(@Body() searchFuelDto : SearchFuelDto) {
-    return this.fuelsService.findByVehicle(searchFuelDto);
-  }
-
-  @Post('/driver')
-  findByDriver(@Body() searchFuelDto : SearchFuelDto) {
-    return this.fuelsService.findByDriver(searchFuelDto);
+    return this.fuelsService.searchFuel(searchFuelDto);
   }
 
   @Put(':id')
   update(@Param('id') id: string, @Body() updateFuelDto: UpdateFuelDto) {
-    return this.fuelsService.update(id, updateFuelDto);
+    return this.fuelsService.update(+id, updateFuelDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.fuelsService.remove(id);
+    return this.fuelsService.remove(+id);
   }
 }
