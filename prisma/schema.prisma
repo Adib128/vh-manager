@@ -8,11 +8,12 @@ generator client {
 }
 
 model Customer {
-  id          Int    @id @default(autoincrement())
+  id          Int       @id @default(autoincrement())
   name        String
-  email       String @unique
-  phoneNumber Int    @unique
+  email       String    @unique
+  phoneNumber Int       @unique
   address     String
+  Booking     Booking[]
 }
 
 model Vehicle {
@@ -27,10 +28,11 @@ model Vehicle {
   purchaseDate       DateTime
   Fuel               Fuel[]
   Expense            Expense[]
+  Booking            Booking[]
 }
 
 model Driver {
-  id                 Int      @id @default(autoincrement())
+  id                 Int       @id @default(autoincrement())
   registrationNumber String
   name               String
   email              String
@@ -38,6 +40,7 @@ model Driver {
   licenseNo          Int
   expDate            DateTime
   Fuel               Fuel[]
+  Booking            Booking[]
 }
 
 model Fuel {
@@ -60,4 +63,19 @@ model Expense {
   description String
   vehicle     Vehicle  @relation(fields: [vehicleId], references: [id])
   vehicleId   Int
+}
+
+model Booking {
+  id          Int      @id @default(autoincrement())
+  bookingDate DateTime
+  fromAddress String
+  toAddress   String
+  distance    Int
+  amount      Decimal 
+  customer    Customer @relation(fields: [customerId], references: [id])
+  vehicle     Vehicle  @relation(fields: [vehicleId], references: [id])
+  driver      Driver   @relation(fields: [driverId], references: [id])
+  customerId  Int
+  vehicleId   Int
+  driverId    Int
 }

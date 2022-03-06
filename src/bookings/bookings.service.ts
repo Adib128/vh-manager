@@ -1,106 +1,97 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { HttpService } from  '@nestjs/axios';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { map } from 'rxjs';
-import { Booking, BookingDocument } from 'src/schemas/booking.schema';
-import { Customer, CustomerDocument } from 'src/schemas/customer.schema';
-import { Driver, DriverDocument } from 'src/schemas/driver.schema';
-import { Vehicle, VehicleDocument } from 'src/schemas/vehicle.schema';
+import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { Prisma, PrismaClient } from '@prisma/client';
 import { CreateBookingDto } from './dto/create-booking.dto';
+import { SearchBookingDto } from './dto/search-booking.dto';
 import { UpdateBookingDto } from './dto/update-booking.dto';
 
 @Injectable()
 export class BookingsService {
-  constructor(
-    @InjectModel(Booking.name) private bookingModel: Model<BookingDocument>,
-    @InjectModel(Vehicle.name) private vehicleModel: Model<VehicleDocument>,
-    @InjectModel(Driver.name) private driverModel: Model<DriverDocument>,
-    @InjectModel(Customer.name) private customerModel: Model<CustomerDocument>,
-    private httpService: HttpService,
-  ) {}
+  constructor(private prisma: PrismaClient) {}
 
-  async create(createBookingDto: CreateBookingDto): Promise<Booking> {
-    return await new this.bookingModel(createBookingDto).save();
-  }
-
-  async findAll(): Promise<Booking[]> {
-    return await this.bookingModel.find().exec();
-  }
-
-  async findByVehicle(vehicleId: string): Promise<Booking[]> {
-    let bookings;
+  // Create new booking
+  async create(createBookingDto: CreateBookingDto) {
     try {
-      let vehicle = await this.vehicleModel.findById(vehicleId).exec();
-      bookings = await this.bookingModel.find({ vehicle: vehicle }).exec();
-    } catch (error) {
-      throw new NotFoundException(
-        `Bookings with the vehicle ID ${vehicleId} is not found`,
-      );
+      return await this.prisma.booking.create({
+        data: createBookingDto,
+      });
+    } catch (e) {
+      console.log(e);
+      // Check if error is coming from prisma client
+      if (e instanceof Prisma.PrismaClientKnownRequestError) {
+        // Check if the booking record exists by the error code P2002
+        if (e.code === 'P2002') {
+          throw new ConflictException('Booking record is already exist');
+        }
+      }
+      throw new BadRequestException('Error on booking creating');
     }
-    return bookings;
   }
 
-  async findByDriver(driverId: string): Promise<Booking[]> {
-    let bookings;
-    try {
-      let driver = await this.driverModel.findById(driverId).exec();
-      bookings = await this.bookingModel.find({ driver: driver }).exec();
-    } catch (error) {
+  // Return booking list
+  async findAll() {
+    return await this.prisma.booking.findMany();
+  }
+
+  // Return by list of booking by search credentials
+  async searchBooking(searchBookingDto: SearchBookingDto){
+    return await this.prisma.booking.findMany({
+      where: searchBookingDto
+    })
+  }
+
+  // Return booking information by ID
+  async findOne(id: number) {
+    const booking = await this.prisma.booking.findUnique({
+      where: { id },
+      include: { vehicle: true, customer: true, driver: true },
+    });
+    // Check if the selected booking record is null and throw not found exception
+    if (!booking) {
       throw new NotFoundException(
-        `Bookings with the vehicle ID ${driverId} is not found`,
+        `Booking record with the ID ${id} is not found`,
       );
-    }
-    return bookings;
-  }
-
-  async findByCustomer(customerId: string): Promise<Booking[]> {
-    let bookings;
-    try {
-      let customer = await this.customerModel.findById(customerId).exec();
-      bookings = await this.bookingModel.find({ customer: customer }).exec();
-    } catch (error) {
-      throw new NotFoundException(
-        `Bookings with the customer ID ${customerId} is not found`,
-      );
-    }
-    return bookings;
-  }
-
-  async findOne(id: string): Promise<Booking> {
-    let booking;
-    try {
-      booking = await this.bookingModel
-        .findById(id)
-        .populate('vehicle')
-        .populate('driver')
-        .populate('customer')
-        .exec();
-    } catch (error) {
-      throw new NotFoundException(`Booking with the ID ${id} is not found`);
     }
     return booking;
   }
 
-  async update(id: string, updateBookingDto: UpdateBookingDto): Promise<Booking> {
-    let booking;
+  // Update booking record information
+  async update(id: number, updateBookingDto: UpdateBookingDto) {
     try {
-      booking = await this.bookingModel.findById(id).exec();
-      return await this.bookingModel
-        .findByIdAndUpdate(id, updateBookingDto, { new: true })
-        .exec();
-    } catch (error) {
-      throw new NotFoundException(`Booking with the ID ${id} is not found`);
+      return await this.prisma.booking.update({
+        where: { id },
+        data: updateBookingDto,
+      });
+    } catch (e) {
+      // Check if error is coming from prisma client
+      if (e instanceof Prisma.PrismaClientKnownRequestError) {
+        // Check if booking found by the error code P2025
+        if (e.code === 'P2025') {
+          throw new NotFoundException(
+            `Booking record with the ID ${id} is not found`,
+          );
+        }
+      }
+      throw new BadRequestException('Error on booking updating');
     }
   }
 
-  async remove(id: string): Promise<any> {
-    let booking;
+  // Remove booking
+  async remove(id: number): Promise<any> {
     try {
-      booking = await this.bookingModel.findById(id).exec();
-      return await this.bookingModel.findByIdAndRemove(id).exec();
-    } catch (error) {
-      throw new NotFoundException(`Booking with the ID ${id} is not found`);
+      return await this.prisma.booking.delete({
+        where: { id },
+      });
+    } catch (e) {
+      // Check if error is coming from prisma client
+      if (e instanceof Prisma.PrismaClientKnownRequestError) {
+        // Check if booking found by the error code P2025
+        if (e.code === 'P2025') {
+          throw new NotFoundException(
+            `Booking record with the ID ${id} is not found`,
+          );
+        }
+      }
+      throw new BadRequestException('Error on booking record deleting');
     }
   }
 }

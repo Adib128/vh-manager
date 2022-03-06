@@ -1,9 +1,5 @@
 import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
 import { Prisma, PrismaClient } from '@prisma/client';
-import { Model } from 'mongoose';
-import { Expense, ExpenseDocument } from 'src/schemas/expense.schema';
-import { Vehicle, VehicleDocument } from 'src/schemas/vehicle.schema';
 import { CreateExpenseDto } from './dto/create-expense.dto';
 import { UpdateExpenseDto } from './dto/update-expense.dto';
 
