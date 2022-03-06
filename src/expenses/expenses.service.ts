@@ -1,5 +1,6 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
+import { Prisma, PrismaClient } from '@prisma/client';
 import { Model } from 'mongoose';
 import { Expense, ExpenseDocument } from 'src/schemas/expense.schema';
 import { Vehicle, VehicleDocument } from 'src/schemas/vehicle.schema';
@@ -8,62 +9,85 @@ import { UpdateExpenseDto } from './dto/update-expense.dto';
 
 @Injectable()
 export class ExpensesService {
-  constructor(
-    @InjectModel(Expense.name) private expenseModel: Model<ExpenseDocument>,
-    @InjectModel(Vehicle.name) private vehicleModel: Model<VehicleDocument>
-    ){}
-  
-  async create(createExpenseDto: CreateExpenseDto): Promise<Expense>  {
-    return await new this.expenseModel(createExpenseDto).save();
-  }
+  constructor(private prisma: PrismaClient) {}
 
-  async findAll() {
-    return await this.expenseModel.find().exec();
-  }
-
-  async findOne(id: string): Promise<Expense> {
-    let expense;
+  // Create new expense record
+  async create(createExpenseDto: CreateExpenseDto) {
     try {
-      expense = await this.expenseModel
-        .findById(id)
-        .populate('vehicle')
-        .exec();
-    } catch (error) {
-      throw new NotFoundException(`Expense with the ID ${id} is not found`);
+      return await this.prisma.expense.create({
+        data: createExpenseDto,
+      });
+    } catch (e) {
+      console.log(e);
+      // Check if error is coming from prisma client
+      if (e instanceof Prisma.PrismaClientKnownRequestError) {
+        // Check if the expense record exists by the error code P2002
+        if (e.code === 'P2002') {
+          throw new ConflictException('Expense record is already exist');
+        }
+      }
+      throw new BadRequestException('Error on expense record creating');
+    }
+  }
+
+  // Return expense records list
+  async findAll() {
+    return await this.prisma.expense.findMany();
+  }
+
+  // Return expense record information by ID
+  async findOne(id: number) {
+    const expense = await this.prisma.expense.findUnique({
+      where: { id },
+      include: { vehicle: true },
+    });
+    // Check if the selected expense record is null and throw not found exception
+    if (!expense) {
+      throw new NotFoundException(
+        `Expense record with the ID ${id} is not found`,
+      );
     }
     return expense;
   }
-  
-  async findByVehicle(vehicleId: string): Promise<Expense> {
-    let expenses;
+
+  // Update expense record information
+  async update(id: number, updateExpenseDto: UpdateExpenseDto) {
     try {
-      let vehicle = await this.vehicleModel.findById(vehicleId).exec();
-      expenses = await this.expenseModel.find({ vehicle: vehicle }).exec();
-    } catch (error) {
-      throw new NotFoundException(
-        `Bookings with the vehicle ID ${vehicleId} is not found`,
-      );
-    }
-    return expenses;
-  }
-
-  async update(id: string, updateExpenseDto: UpdateExpenseDto) {
-    let expense;
-    try{
-      expense =  await this.expenseModel.findById(id).exec();
-      return await this.expenseModel.findByIdAndUpdate(id, updateExpenseDto, {new: true}).exec();
-    }catch(error){
-      throw new NotFoundException(`Expense with the ID ${id} is not found`);
+      return await this.prisma.expense.update({
+        where: { id },
+        data: updateExpenseDto
+      });
+    } catch (e) {
+      // Check if error is coming from prisma client
+      if (e instanceof Prisma.PrismaClientKnownRequestError) {
+        // Check if expense record found by the error code P2025
+        if (e.code === 'P2025') {
+          throw new NotFoundException(
+            `Expense record with the ID ${id} is not found`,
+          );
+        }
+      }
+      throw new BadRequestException('Error on expense record updating');
     }
   }
 
-  async remove(id: string) {
-    let expense;
-    try{
-      expense =  await this.expenseModel.findById(id).exec();
-      return await this.expenseModel.findByIdAndRemove(id).exec();
-    }catch(error){
-      throw new NotFoundException(`Expense with the ID ${id} is not found`);
+  // Remove expense record
+  async remove(id: number): Promise<any> {
+    try {
+      return await this.prisma.expense.delete({
+        where: { id },
+      });
+    } catch (e) {
+      // Check if error is coming from prisma client
+      if (e instanceof Prisma.PrismaClientKnownRequestError) {
+        // Check if expense record found by the error code P2025
+        if (e.code === 'P2025') {
+          throw new NotFoundException(
+            `Expense record with the ID ${id} is not found`,
+          );
+        }
+      }
+      throw new BadRequestException('Error on expense record deleting');
     }
   }
 }

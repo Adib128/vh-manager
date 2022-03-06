@@ -7,9 +7,9 @@ import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { SearchFuelDto } from './dto/search-fuel.dto';
 
 @Controller('fuels')
-//@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard)
 @ApiTags('Fuel')
-//@ApiBearerAuth('access-token')
+@ApiBearerAuth('access-token')
 export class FuelsController {
   constructor(private readonly fuelsService: FuelsService) {}
 

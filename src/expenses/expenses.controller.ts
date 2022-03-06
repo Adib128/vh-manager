@@ -24,21 +24,16 @@ export class ExpensesController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.expensesService.findOne(id);
-  }
-
-  @Get('vehicle/:vehicleId')
-  findByVehicle(@Param('vehicleId') vehicleId: string) {
-    return this.expensesService.findByVehicle(vehicleId);
+    return this.expensesService.findOne(+id);
   }
 
   @Put(':id')
   update(@Param('id') id: string, @Body() updateExpenseDto: UpdateExpenseDto) {
-    return this.expensesService.update(id, updateExpenseDto);
+    return this.expensesService.update(+id, updateExpenseDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.expensesService.remove(id);
+    return this.expensesService.remove(+id);
   }
 }
