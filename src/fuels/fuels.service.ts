@@ -20,7 +20,6 @@ export class FuelsService {
         data: createFuelDto,
       });
     } catch (e) {
-      console.log(e);
       // Check if error is coming from prisma client
       if (e instanceof Prisma.PrismaClientKnownRequestError) {
         // Check if the fuel record exists by the error code P2002

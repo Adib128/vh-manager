@@ -71,11 +71,17 @@ model Booking {
   fromAddress String
   toAddress   String
   distance    Int
-  amount      Decimal 
+  amount      Decimal
   customer    Customer @relation(fields: [customerId], references: [id])
   vehicle     Vehicle  @relation(fields: [vehicleId], references: [id])
   driver      Driver   @relation(fields: [driverId], references: [id])
   customerId  Int
   vehicleId   Int
   driverId    Int
+}
+
+model User {
+  id       Int    @id @default(autoincrement())
+  username String
+  password String
 }
