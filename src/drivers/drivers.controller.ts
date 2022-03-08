@@ -6,9 +6,9 @@ import { CreateDriverDto } from './dto/create-driver.dto';
 import { UpdateDriverDto } from './dto/update-driver.dto';
 
 @Controller('drivers')
-//@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard)
 @ApiTags('Driver')
-//@ApiBearerAuth('access-token')
+@ApiBearerAuth('access-token')
 export class DriversController {
   constructor(private readonly driversService: DriversService) {}
 

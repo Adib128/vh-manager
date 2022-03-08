@@ -1,27 +1,31 @@
 version: '3'
 services:
-  app:
-    container_name: vh-manager
+  backend-app:
+    container_name: backend-app
     restart: always
     build: .
     ports:
       - '3000:3000'
     links:
-      - mongo
+      - database
     networks:
-      - vhmanager  
-  mongo:
-    container_name: mongo
-    image: mongo
+      - vhm  
+
+  database:
+    container_name: postgres
+    image: postgres:latest
     ports:
-      - '27017:27017'
+      - "5432:5432"
     volumes:
-      - mongodb:/data/db  
+      - /data/postgres:/data/postgres
+    env_file:
+      - .env
     networks:
-      - vhmanager   
+      - vhm 
+
 volumes:
-  mongodb:
+  database:
     driver: local
 networks:
-  vhmanager:
+  vhm:
     driver: bridge
