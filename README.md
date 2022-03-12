@@ -12,11 +12,9 @@ the system composed by:
 
 ## Built With
 - [NestJS](https://nestjs.com/) a progressive Node.js framework built with TypeScript
-- [MongoDB](https://www.mongodb.com/) a document-oriented NoSQL database
-- [Mongoose](https://mongoosejs.com/) MongoDB object modeling for Node.js
+- [Prisma](https://www.prisma.io/) Next-generation Node.js and TypeScript ORM
+- [Postgres](https://www.postgresql.org/) Open Source Relational Database
 - [JWT](https://jwt.io/) standard for signature and optional encryption
-- [Bcrypt](https://www.npmjs.com/package/bcrypt) a password hashing library
-- [PassportJS](http://www.passportjs.org/) an authentication middleware for Node.js
 - [Swagger](https://swagger.io/) tools for documenting  RESTful APIs
 
 

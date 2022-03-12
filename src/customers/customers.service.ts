@@ -20,14 +20,7 @@ export class CustomersService {
         data: createCustomerDto,
       });
     } catch (e) {
-      // Check if error is coming from prisma client
-      if (e instanceof Prisma.PrismaClientKnownRequestError) {
-        // Check if customer exists by the error code P2002
-        if (e.code === 'P2002') {
-          throw new ConflictException('Customer is already exist');
-        }
-      }
-      throw new BadRequestException('Error on customer creating');
+      this.handleError(e);
     }
   }
 
@@ -45,7 +38,7 @@ export class CustomersService {
     });
     // Check if the selected customer is null and throw not found exception
     if (!customer) {
-      throw new NotFoundException(`Customer with the ID ${id} is not found`);
+      this.handleNotFoundError(id);
     }
     return customer;
   }
@@ -58,16 +51,7 @@ export class CustomersService {
         data: updateCustomerDto,
       });
     } catch (e) {
-      // Check if error is coming from prisma client
-      if (e instanceof Prisma.PrismaClientKnownRequestError) {
-        // Check if customer found by the error code P2025
-        if (e.code === 'P2025') {
-          throw new NotFoundException(
-            `Customer with the ID ${id} is not found`,
-          );
-        }
-      }
-      throw new BadRequestException('Error on customer updating');
+      this.handleError(e, id);
     }
   }
 
@@ -78,16 +62,24 @@ export class CustomersService {
         where: { id },
       });
     } catch (e) {
-      // Check if error is coming from prisma client
-      if (e instanceof Prisma.PrismaClientKnownRequestError) {
-        // Check if customer found by the error code P2025
-        if (e.code === 'P2025') {
-          throw new NotFoundException(
-            `Customer with the ID ${id} is not found`,
-          );
-        }
-      }
-      throw new BadRequestException('Error on customer deleting');
+      this.handleError(e, id);
     }
+  }
+
+  handleError(e?: object, id?: number) {
+    // Check if error is coming from prisma client
+    if (e instanceof Prisma.PrismaClientKnownRequestError) {
+      // Check if customer found by the error code P2025
+      if (e.code === 'P2025') {
+        throw new NotFoundException(`Customer with the ID ${id} is not found`);
+      } else if (e.code == 'P2002') {
+        throw new ConflictException('Customer is already exist');
+      }
+    }
+    throw new BadRequestException();
+  }
+
+  handleNotFoundError(id: number) {
+    throw new NotFoundException(`Customer with the ID ${id} is not found`);
   }
 }

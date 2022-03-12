@@ -1,0 +1,31 @@
+version: '3'
+services:
+  backend-app:
+    container_name: backend-app
+    restart: always
+    build: .
+    ports:
+      - '3000:3000'
+    links:
+      - database
+    networks:
+      - vhm  
+
+  database:
+    container_name: postgres
+    image: postgres:latest
+    ports:
+      - "5432:5432"
+    volumes:
+      - /data/postgres:/data/postgres
+    env_file:
+      - .env
+    networks:
+      - vhm 
+
+volumes:
+  database:
+    driver: local
+networks:
+  vhm:
+    driver: bridge
