@@ -1,18 +1,26 @@
-FROM node:14
+FROM node:14 AS builder
 
-WORKDIR /usr/src/apps/vhm
+# Create app directory
+WORKDIR /app
 
+# A wildcard is used to ensure both package.json AND package-lock.json are copied
 COPY package*.json ./
-COPY prisma ./prisma/ 
+COPY prisma ./prisma/
 
+# Install app dependencies
 RUN npm install
 
 COPY . .
 
 RUN npm run build
 
-RUN npx prisma migrate deploy
+FROM node:14
+
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/package*.json ./
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/prisma ./prisma
 
 EXPOSE 3000
-
-CMD ["node", "dist/src/main"]
+# 👇 new migrate and start app script
+CMD [  "npm", "run", "start:migrate:prod" ]
