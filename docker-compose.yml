@@ -1,31 +1,27 @@
-version: '3'
+version: '3.7'
 services:
-  backend-app:
-    container_name: backend-app
-    restart: always
-    build: .
-    ports:
-      - '3000:3000'
-    links:
-      - database
-    networks:
-      - vhm  
-
-  database:
+  postgres:
+    image: postgres:12
     container_name: postgres
-    image: postgres:latest
+    restart: always
     ports:
-      - "5432:5432"
-    volumes:
-      - /data/postgres:/data/postgres
+      - 5432:5432
     env_file:
       - .env
-    networks:
-      - vhm 
-
+    volumes:
+      - postgres:/var/lib/postgres/data
+      
+  nest-api:
+    container_name: nest-api
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 3000:3000
+    depends_on:
+      - postgres
+    env_file:
+      - .env
 volumes:
-  database:
-    driver: local
-networks:
-  vhm:
-    driver: bridge
+  postgres:
+    name: nest-db
