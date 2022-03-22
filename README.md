@@ -32,6 +32,9 @@ $ git clone https://github.com/Adib128/vh-manager.git
 # Change directory
 $ cd vh-manager
 
+# Rename the .env example file
+$ mv .env.example .env
+
 # Runing the docker container
 $ docker-compose up
 
@@ -47,6 +50,9 @@ $ git clone https://github.com/Adib128/vh-manager.git
 
 # Change directory
 $ cd vh-manager
+
+# Rename the .env example file
+$ mv .env.example .env
 
 # Install NPM dependencies
 $ npm install
