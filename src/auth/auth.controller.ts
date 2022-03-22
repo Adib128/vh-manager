@@ -1,6 +1,7 @@
 import { Body, Request, Controller, Get, Post, UseGuards, HttpCode, Put, ClassSerializerInterceptor, UseInterceptors } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
+import { ChangePasswordDto } from './dto/change-password.dto';
 import { EditDto } from './dto/edit.dto';
 import { SigninDto } from './dto/signin.dto';
 import { SignupDto } from './dto/signup.dto';
@@ -37,5 +38,12 @@ export class AuthController {
   @Put('edit')
   updateProfile(@Request() req, @Body() editDto: EditDto) {
     return this.authService.edit(req.user.id, editDto);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('access-token')
+  @Put('password')
+  changePassword(@Request() req, @Body() changePasswordDto: ChangePasswordDto) {
+    return this.authService.changePassword(req.user.id, changePasswordDto);
   }
 }

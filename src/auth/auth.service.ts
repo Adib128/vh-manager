@@ -1,6 +1,5 @@
 import {
   BadRequestException,
-  Body,
   ConflictException,
   Injectable,
   NotFoundException,
@@ -11,6 +10,7 @@ import * as bcrypt from 'bcrypt';
 import { Prisma, PrismaClient } from '@prisma/client';
 import { SignupDto } from './dto/signup.dto';
 import { EditDto } from './dto/edit.dto';
+import { ChangePasswordDto } from './dto/change-password.dto';
 
 @Injectable()
 export class AuthService {
@@ -41,9 +41,7 @@ export class AuthService {
   // Login user
   async signIn(signinDto: SigninDto) {
     try {
-      const user = await this.prisma.user.findFirst({
-        where: { username: signinDto.username },
-      });
+      const user = await this.getUser(signinDto.username);
       const valid = await bcrypt.compare(signinDto.password, user.password);
       if (valid) {
         // Create payload and sign JWT access token
@@ -59,9 +57,7 @@ export class AuthService {
 
   // Validate user
   async validateUser(username: string, password: string) {
-    const user = await this.prisma.user.findFirst({
-      where: { username: username },
-    });
+    const user = await this.getUser(username);
     if (!user) {
       return null;
     }
@@ -75,13 +71,9 @@ export class AuthService {
   // Return user information by ID
   async profile(id: number) {
     try {
-      let user = await this.prisma.user.findUnique({
-        where: {
-          id,
-        },
-      });
+      let user = await this.getUniqueUser(id);
       return this.exclude(user, 'password');
-    } catch (error) {
+    } catch (e) {
       throw new NotFoundException(`User with the ID ${id} is not found`);
     }
   }
@@ -89,10 +81,6 @@ export class AuthService {
   // Edit user profile
   async edit(id: number, editDto: EditDto) {
     try {
-      await this.prisma.user.update({
-        where: { id },
-        data: editDto,
-      });
       return await this.profile(id);
     } catch (e) {
       if (e instanceof Prisma.PrismaClientKnownRequestError) {
@@ -102,6 +90,46 @@ export class AuthService {
       }
       throw new BadRequestException('Error on user updating');
     }
+  }
+
+  // Change user password
+  async changePassword(id: number, changePasswordDto: ChangePasswordDto) {
+    try {
+      const user = await this.getUniqueUser(id);
+      const valid = await bcrypt.compare(
+        changePasswordDto.oldPassword,
+        user.password,
+      );
+      if (valid) {
+        await this.prisma.user.update({
+          where: { id },
+          data: { password: await bcrypt.hash(changePasswordDto.password, 10) },
+        });
+        return { success: true, message: 'Password changed successsfully' };
+      } else {
+        return { success: false, message: 'Old password incorrect' };
+      }
+    } catch (e) {
+      throw new NotFoundException(`User with the ID ${id} is not found`);
+    }
+  }
+
+  // Return user by ID
+  async getUniqueUser(id: number) {
+    const user = await this.prisma.user.findUnique({
+      where: {
+        id,
+      },
+    });
+    return user;
+  }
+
+  // Return user by username
+  async getUser(username: string) {
+    const user = await this.prisma.user.findFirst({
+      where: { username: username },
+    });
+    return user;
   }
 
   // Return user object with hashed password
