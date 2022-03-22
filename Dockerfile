@@ -12,6 +12,7 @@ RUN npm install
 
 COPY . .
 
+# Build the nest project
 RUN npm run build
 
 FROM node:14
@@ -22,5 +23,5 @@ COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/prisma ./prisma
 
 EXPOSE 3000
-# 👇 new migrate and start app script
+# Migrate and start app script
 CMD [  "npm", "run", "start:migrate:prod" ]
