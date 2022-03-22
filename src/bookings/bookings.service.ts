@@ -16,9 +16,7 @@ export class BookingsService {
       });
     } catch (e) {
       console.log(e);
-      // Check if error is coming from prisma client
       if (e instanceof Prisma.PrismaClientKnownRequestError) {
-        // Check if the booking record exists by the error code P2002
         if (e.code === 'P2002') {
           throw new ConflictException('Booking record is already exist');
         }
@@ -45,7 +43,6 @@ export class BookingsService {
       where: { id },
       include: { vehicle: true, customer: true, driver: true },
     });
-    // Check if the selected booking record is null and throw not found exception
     if (!booking) {
       throw new NotFoundException(
         `Booking record with the ID ${id} is not found`,
@@ -62,9 +59,7 @@ export class BookingsService {
         data: updateBookingDto,
       });
     } catch (e) {
-      // Check if error is coming from prisma client
       if (e instanceof Prisma.PrismaClientKnownRequestError) {
-        // Check if booking found by the error code P2025
         if (e.code === 'P2025') {
           throw new NotFoundException(
             `Booking record with the ID ${id} is not found`,
@@ -82,9 +77,7 @@ export class BookingsService {
         where: { id },
       });
     } catch (e) {
-      // Check if error is coming from prisma client
       if (e instanceof Prisma.PrismaClientKnownRequestError) {
-        // Check if booking found by the error code P2025
         if (e.code === 'P2025') {
           throw new NotFoundException(
             `Booking record with the ID ${id} is not found`,

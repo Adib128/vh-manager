@@ -20,9 +20,7 @@ export class VehiclesService {
         data: createVehicleDto,
       });
     } catch (e) {
-      // Check if error is coming from prisma client
       if (e instanceof Prisma.PrismaClientKnownRequestError) {
-        // Check if vehicle exists by the error code P2002
         if (e.code === 'P2002') {
           throw new ConflictException('Vehicle is already exist');
         }
@@ -43,7 +41,6 @@ export class VehiclesService {
         id,
       },
     });
-    // Check if the selected vehicle is null and throw not found exception
     if (!vehicle) {
       throw new NotFoundException(`Veicle with the ID ${id} is not found`);
     }
@@ -58,9 +55,7 @@ export class VehiclesService {
         data: updateVehicleDto,
       });
     } catch (e) {
-      // Check if error is coming from prisma client
       if (e instanceof Prisma.PrismaClientKnownRequestError) {
-        // Check if vehicle found by the error code P2025
         if (e.code === 'P2025') {
           throw new NotFoundException(`Vehicle with the ID ${id} is not found`);
         }
@@ -76,9 +71,7 @@ export class VehiclesService {
         where: { id },
       });
     } catch (e) {
-      // Check if error is coming from prisma client
       if (e instanceof Prisma.PrismaClientKnownRequestError) {
-        // Check if vehicle found by the error code P2025
         if (e.code === 'P2025') {
           throw new NotFoundException(`Vehicle with the ID ${id} is not found`);
         }

@@ -1,5 +1,5 @@
 import { DocumentBuilder } from "@nestjs/swagger";
-
+// Setting Swagger configuration
 export const swaggerConfig = new DocumentBuilder()
     .setTitle('VH-Manager')
     .setDescription('VH-Manager is a RESTful API for Fleet Management System. This system enables the company to manage all the resources of the fleet and the vehicle booking.')
@@ -11,6 +11,7 @@ export const swaggerConfig = new DocumentBuilder()
     .addTag('Booking')
     .addTag('Fuel')
     .addTag('Expense')
+    // Adding the bearer authentication in the header of the swagger documentation
     .addBearerAuth(
       {
         description: `Please sign in and enter the returned token`,

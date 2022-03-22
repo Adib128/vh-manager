@@ -15,9 +15,7 @@ export class DriversService {
         data: createDriverDto,
       });
     } catch (e) {
-      // Check if error is coming from prisma client
       if (e instanceof Prisma.PrismaClientKnownRequestError) {
-        // Check if driver exists by the error code P2002
         if (e.code === 'P2002') {
           throw new ConflictException('Driver is already exist');
         }
@@ -38,7 +36,6 @@ export class DriversService {
         id,
       },
     });
-    // Check if the selected driver is null and throw not found exception
     if (!driver) {
       throw new NotFoundException(`Driver with the ID ${id} is not found`);
     }
@@ -53,9 +50,7 @@ export class DriversService {
         data: updateDriverDto,
       });
     } catch (e) {
-      // Check if error is coming from prisma client
       if (e instanceof Prisma.PrismaClientKnownRequestError) {
-        // Check if driver found by the error code P2025
         if (e.code === 'P2025') {
           throw new NotFoundException(`Driver with the ID ${id} is not found`);
         }
@@ -71,9 +66,7 @@ export class DriversService {
         where: { id },
       });
     } catch (e) {
-      // Check if error is coming from prisma client
       if (e instanceof Prisma.PrismaClientKnownRequestError) {
-        // Check if driver found by the error code P2025
         if (e.code === 'P2025') {
           throw new NotFoundException(`Driver with the ID ${id} is not found`);
         }

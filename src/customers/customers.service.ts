@@ -2,7 +2,7 @@ import {
   BadRequestException,
   ConflictException,
   Injectable,
-  NotFoundException,
+  NotFoundException
 } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from 'prisma.service';
@@ -20,7 +20,12 @@ export class CustomersService {
         data: createCustomerDto,
       });
     } catch (e) {
-      this.handleError(e);
+      if (e instanceof Prisma.PrismaClientKnownRequestError) {
+        if (e.code === 'P2002') {
+          throw new ConflictException('Customer is already exist');
+        }
+      }
+      throw new BadRequestException('Error on customer creating');
     }
   }
 
@@ -36,9 +41,8 @@ export class CustomersService {
         id,
       },
     });
-    // Check if the selected customer is null and throw not found exception
     if (!customer) {
-      this.handleNotFoundError(id);
+      throw new NotFoundException(`Customer with the ID ${id} is not found`);
     }
     return customer;
   }
@@ -51,7 +55,12 @@ export class CustomersService {
         data: updateCustomerDto,
       });
     } catch (e) {
-      this.handleError(e, id);
+      if (e instanceof Prisma.PrismaClientKnownRequestError) {
+        if (e.code === 'P2025') {
+          throw new NotFoundException(`Customer with the ID ${id} is not found`);
+        }
+      }
+      throw new BadRequestException('Error on customer updating');
     }
   }
 
@@ -62,24 +71,12 @@ export class CustomersService {
         where: { id },
       });
     } catch (e) {
-      this.handleError(e, id);
-    }
-  }
-
-  handleError(e?: object, id?: number) {
-    // Check if error is coming from prisma client
-    if (e instanceof Prisma.PrismaClientKnownRequestError) {
-      // Check if customer found by the error code P2025
-      if (e.code === 'P2025') {
-        throw new NotFoundException(`Customer with the ID ${id} is not found`);
-      } else if (e.code == 'P2002') {
-        throw new ConflictException('Customer is already exist');
+      if (e instanceof Prisma.PrismaClientKnownRequestError) {
+        if (e.code === 'P2025') {
+          throw new NotFoundException(`Customer with the ID ${id} is not found`);
+        }
       }
+      throw new BadRequestException('Error on customer deleting');
     }
-    throw new BadRequestException();
-  }
-
-  handleNotFoundError(id: number) {
-    throw new NotFoundException(`Customer with the ID ${id} is not found`);
   }
 }

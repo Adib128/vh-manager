@@ -14,10 +14,7 @@ export class ExpensesService {
         data: createExpenseDto,
       });
     } catch (e) {
-      console.log(e);
-      // Check if error is coming from prisma client
       if (e instanceof Prisma.PrismaClientKnownRequestError) {
-        // Check if the expense record exists by the error code P2002
         if (e.code === 'P2002') {
           throw new ConflictException('Expense record is already exist');
         }
@@ -37,7 +34,6 @@ export class ExpensesService {
       where: { id },
       include: { vehicle: true },
     });
-    // Check if the selected expense record is null and throw not found exception
     if (!expense) {
       throw new NotFoundException(
         `Expense record with the ID ${id} is not found`,
@@ -54,9 +50,7 @@ export class ExpensesService {
         data: updateExpenseDto
       });
     } catch (e) {
-      // Check if error is coming from prisma client
       if (e instanceof Prisma.PrismaClientKnownRequestError) {
-        // Check if expense record found by the error code P2025
         if (e.code === 'P2025') {
           throw new NotFoundException(
             `Expense record with the ID ${id} is not found`,
@@ -74,9 +68,7 @@ export class ExpensesService {
         where: { id },
       });
     } catch (e) {
-      // Check if error is coming from prisma client
       if (e instanceof Prisma.PrismaClientKnownRequestError) {
-        // Check if expense record found by the error code P2025
         if (e.code === 'P2025') {
           throw new NotFoundException(
             `Expense record with the ID ${id} is not found`,

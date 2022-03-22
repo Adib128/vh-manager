@@ -20,9 +20,7 @@ export class FuelsService {
         data: createFuelDto,
       });
     } catch (e) {
-      // Check if error is coming from prisma client
       if (e instanceof Prisma.PrismaClientKnownRequestError) {
-        // Check if the fuel record exists by the error code P2002
         if (e.code === 'P2002') {
           throw new ConflictException('Fuel record is already exist');
         }
@@ -42,7 +40,6 @@ export class FuelsService {
       where: { id },
       include: { vehicle: true, driver: true },
     });
-    // Check if the selected fuel record is null and throw not found exception
     if (!fuel) {
       throw new NotFoundException(`Veicle with the ID ${id} is not found`);
     }
@@ -64,9 +61,7 @@ export class FuelsService {
         data: updateFuelDto,
       });
     } catch (e) {
-      // Check if error is coming from prisma client
       if (e instanceof Prisma.PrismaClientKnownRequestError) {
-        // Check if fuel record found by the error code P2025
         if (e.code === 'P2025') {
           throw new NotFoundException(
             `Fuel record with the ID ${id} is not found`,
@@ -84,9 +79,7 @@ export class FuelsService {
         where: { id },
       });
     } catch (e) {
-      // Check if error is coming from prisma client
       if (e instanceof Prisma.PrismaClientKnownRequestError) {
-        // Check if fuel record found by the error code P2025
         if (e.code === 'P2025') {
           throw new NotFoundException(
             `Fuel record with the ID ${id} is not found`,

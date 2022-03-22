@@ -6,67 +6,65 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { LoginDto } from './dto/login.dto';
+import { SigninDto } from './dto/signin.dto';
 import * as bcrypt from 'bcrypt';
 import { Prisma, PrismaClient } from '@prisma/client';
+import { SignupDto } from './dto/signup.dto';
+import { EditDto } from './dto/edit.dto';
 
 @Injectable()
 export class AuthService {
   constructor(private prisma: PrismaClient, private jwtService: JwtService) {}
 
   // Register user
-  async signUp(loginDto: LoginDto) {
+  async signUp(signupDto: SignupDto) {
     try {
       // Create new user
       const user = await this.prisma.user.create({
-        data: await this.transformUser(loginDto),
+        data: await this.transformUser(signupDto),
       });
       // Create payload for jwt
-      const payload = { username: loginDto.username, sub: user.id };
+      const payload = { username: signupDto.username, sub: user.id };
       return {
         // Sign JWT and get access token
         accessToken: this.jwtService.sign(payload),
       };
     } catch (e) {
-      // Check if error is coming from prisma client
       if (e instanceof Prisma.PrismaClientKnownRequestError) {
-        // Check if the user exists by the error code P2002
         if (e.code === 'P2002') {
           throw new ConflictException('User is already exist');
         }
       }
-      throw new BadRequestException('Error on user record creating');
+      throw new BadRequestException('Error on user creating');
     }
   }
   // Login user
-  async signIn(loginDto: LoginDto) {
+  async signIn(signinDto: SigninDto) {
     try {
-      // Query user with username
       const user = await this.prisma.user.findFirst({
-        where: { username: loginDto.username }
+        where: { username: signinDto.username },
       });
-      // Create payload
-      const payload = { username: loginDto.username, sub: user.id };
-      return {
-        // Sign JWT and get access token
-        accessToken: this.jwtService.sign(payload),
-      };
+      const valid = await bcrypt.compare(signinDto.password, user.password);
+      if (valid) {
+        // Create payload and sign JWT access token
+        const payload = { username: signinDto.username, sub: user.id };
+        return {
+          accessToken: this.jwtService.sign(payload),
+        };
+      }
     } catch (e) {
       throw new NotFoundException(`User not found`);
     }
   }
-  
+
   // Validate user
   async validateUser(username: string, password: string) {
-    
     const user = await this.prisma.user.findFirst({
-      where: { username: username }
+      where: { username: username },
     });
-    // Check if user is null
     if (!user) {
       return null;
     }
-    // Compare password with bcrypt
     const valid = await bcrypt.compare(password, user.password);
     if (valid) {
       return user;
@@ -75,48 +73,58 @@ export class AuthService {
   }
 
   // Return user information by ID
-  async profile(id: number){
+  async profile(id: number) {
     try {
-      // Query user iformation
-      const user = await this.prisma.user.findUnique({
+      let user = await this.prisma.user.findUnique({
         where: {
           id,
         },
       });
-      return user;
+      return this.exclude(user, 'password');
     } catch (error) {
       throw new NotFoundException(`User with the ID ${id} is not found`);
     }
   }
 
   // Edit user profile
-  async edit(id: number, @Body() body) {
+  async edit(id: number, editDto: EditDto) {
     try {
-      // Get user information
-      const user = await this.profile(id);
-      // Compare old password with new password
-      const valid = await bcrypt.compare(body.oldPassword, user.password);
-      if (!valid) {
-        return { success: false, error: 'Old password incorrect' };
+      await this.prisma.user.update({
+        where: { id },
+        data: editDto,
+      });
+      return await this.profile(id);
+    } catch (e) {
+      if (e instanceof Prisma.PrismaClientKnownRequestError) {
+        if (e.code === 'P2025') {
+          throw new NotFoundException(`User not found`);
+        }
       }
-      // Hash new password
-      body.newPassword = await bcrypt.hash(body.newPassword, 10);
-      return { success: true };
-    } catch (error) {
-      throw new NotFoundException(`User with the ID ${id} is not found`);
+      throw new BadRequestException('Error on user updating');
     }
   }
 
   // Return user object with hashed password
-  async transformUser(loginDto: LoginDto) {
-    // Get username and password from loginDto
-    const { username, password } = loginDto;
+  async transformUser(signupDto: SignupDto) {
+    const { name, email, username, password } = signupDto;
     // Hash password with bcrypt
     const hashedPassword = await bcrypt.hash(password, 10);
-    // Object user with hashed password
     return {
-      username: username,
+      name,
+      email,
+      username,
       password: hashedPassword,
     };
+  }
+
+  // Exclude keys from user
+  exclude<User, Key extends keyof User>(
+    user: User,
+    ...keys: Key[]
+  ): Omit<User, Key> {
+    for (let key of keys) {
+      delete user[key];
+    }
+    return user;
   }
 }

@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Put, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete, Put, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { CustomersService } from './customers.service';
@@ -21,17 +21,20 @@ export class CustomersController {
   findAll() {
     return this.customersService.findAll();
   }
-  
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.customersService.findOne(+id);
   }
 
   @Put(':id')
-  update(@Param('id') id: string, @Body() updateCustomerDto: UpdateCustomerDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateCustomerDto: UpdateCustomerDto,
+  ) {
     return this.customersService.update(+id, updateCustomerDto);
   }
- 
+
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.customersService.remove(+id);
