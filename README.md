@@ -34,7 +34,8 @@ the layers of the application are:
 
 ### Request example:
 
-#### Request with parameters
+#### Request with parameters 
+- the postman collection file into the project directory
 ``` 
 http://127.0.0.1:8888/search?adult_number=2&check_in_date=2022-01-06&check_out_date=2022-01-06
 
