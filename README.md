@@ -1,66 +1,56 @@
 
-# VH-Manager - Fleet Management System RESTful API
-VH-Manager is a RESTful API for Fleet Management System. This system enables the company to manage all the resources of the fleet as well as the vehicle booking managment.
-the system composed by:
+## Overview
+- I implemented the example of getting "Indian Burial Ground Yurts" from both providers for the night of Jan 6, comparing the margin and return the margin preferable  margin from Fantastic Yurts.
+- If I had time I would add the feature of returning the most cheapest packge of rooms and to implement the condition of children Children under the age of 13 must never be alone.
+  
 
-- Vehicles management
-- Drivers management
-- Fuels consumption management
-- Vehicle expenses management
-- Vehicle bookings management
-- Customers maangement
+### Architecture:
+I implemented the architecture Layered Structure that I splited application on layers and I used the dependency injection to perform the injection.
+the layers of the application are:
+* Controller (communicate with all external sources) 
+* Service (Business logic layer)
+* Repository (fetch and prepare data.)
+* Data Provider (retrieve data from data source)
 
-## Built With
-- [NestJS](https://nestjs.com/) a progressive Node.js framework built with TypeScript
-- [Prisma](https://www.prisma.io/) Next-generation Node.js and TypeScript ORM
-- [Postgres](https://www.postgresql.org/) Open Source Relational Database
-- [JWT](https://jwt.io/) standard for signature and optional encryption
-- [Swagger](https://swagger.io/) tools for documenting  RESTful APIs
+ ![Architecture Diagram](https://i.postimg.cc/GhmdKg0Z/diagram.png)
+  
+
+### packages:
+
+- [PHP-DI](https://php-di.org/): Dpendency injection container.
+- [PHP-DI Slim](https://php-di.org/doc/frameworks/slim.html): PHP-DI bridge for Slim framework.
+- [Guzzle](https://github.com/guzzle/guzzle) : Guzzle is a PHP HTTP client.
+- [Carbon](https://carbon.nesbot.com/) : A simple PHP API extension for DateTime.
+
+### Entry point:
+#### File:
+``` public/index.php ```
+#### URL:
+``` http://127.0.0.1:8888/ ```
+
+### Test:
+``` ./vendor/bin/phpunit tests ```
 
 
-## Installation
+### Request example:
 
-### Installation with docker
-Install docker on Mac, Windows or Linux [https://docs.docker.com/get-docker/](https://docs.docker.com/get-docker/)
-
-For Linux you need to install docker compose separately here [https://docs.docker.com/compose/install/](https://docs.docker.com/compose/install/)
-
-```bash
-# Get the latest snapshot
-$ git clone https://github.com/Adib128/vh-manager.git
-
-# Change directory
-$ cd vh-manager
-
-# Rename the .env example file
-$ mv .env.example .env
-
-# Runing the docker container
-$ docker-compose up
+#### Request with parameters
+``` 
+http://127.0.0.1:8888/search?adult_number=2&check_in_date=2022-01-06&check_out_date=2022-01-06
 
 ```
-Now if you go to http://localhost:3000/api-docs/, you'll get
-
-### Installation without docker
-
-You can install the project on your own server.
-```bash
-# Get the latest snapshot
-$ git clone https://github.com/Adib128/vh-manager.git
-
-# Change directory
-$ cd vh-manager
-
-# Rename the .env example file
-$ mv .env.example .env
-
-# Install NPM dependencies
-$ npm install
-
-# Then simply start the project
-$ npm run start
+#### Response
+```JSON 
+[
+    {
+        "Name": "Indian Burial Ground Yurts",
+        "rooms": [
+            {
+                "Id": "1",
+                "MaxPersons": "5",
+                "Price": 200
+            }
+        ]
+    }
+]
 ```
-
-## Documentation
-
-You'll find the API documentation here [https://vh-manager.herokuapp.com/api-docs/](https://vh-manager.herokuapp.com/api-docs/).
